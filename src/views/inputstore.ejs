@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>List Product</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="#">Quản Lý</a>
+      </div>
+      <ul class="nav navbar-nav">
+        <li><a href="/user-page">Doanh thu</a></li>
+        <li class="active"><a href="/user/nhap-kho">Danh sách sản phẩm</a></li>
+      </ul>
+    </div>
+</nav>
+    <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>ID PRODUCT</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Quantily</th>
+            <th>Type_product</th>
+            <th>Sale</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <h1>DANH SÁCH SẢN PHẨM</h1>
+            <% for(var i=0; i < product.length; i++) {%>
+                <tr>
+                  <td><%= product[i].id %></td>
+                  <td><%= product[i].id_product %></td>
+                  <td><%= product[i].name %></td>
+                  <td><%= product[i].price %></td>
+                  <td><%= product[i].quantily %></td>
+                  <td><%= product[i].type_product %></td>
+                  <td><%= product[i].sale %></td>
+                  <td>
+                      <button onclick="passDataIdProduct(this)" class=" btn btn-primary btn-import-product" data-toggle="modal" data-target="#myFormModal" data-id-product="<%= product[i].id_product %>" >Nhập/Xuất</button>
+                      <button class="btn btn-info btn-edit-product" data-id-product="<%= product[i].id_product %>">Sửa</button> 
+                      <button class="btn btn-danger btn-delete-product" data-id-product="<%= product[i].id_product %>">Xóa</button>
+                  </td> 
+                </tr> 
+                <%} 
+              %>
+        </tbody>
+      </table>
+      <button type="button" class="btn btn-success"><a href="/product/create-product" style="color: white">Thêm mới</a></button>
+
+      <div class="modal" id="myFormModal" tabindex="-1" role="dialog" aria-labelledby="myFormModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="myFormModalLabel">Nhập thêm hàng - Vui lòng nhập số lượng nhập thêm</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <!-- Form ẩn để gửi dữ liệu -->
+              <form id="hiddenForm" method="post" action="/test">
+                <input type="hidden" id="dataIdProduct" name="dataIdProduct">
+                <input type="text" class="form-control" id="inputText" name="inputText" placeholder="Vui lòng nhập số lượng">
+                <input type="hidden" id="actionType" name="actionType" value="">
+                <!--  Các trường dữ liệu khác nếu cần " -->
+                <button style="display: none;" type="submit" class="btn btn-primary" id="hiddenSubmit">Submit</button> 
+              </form>
+            </div>
+            <div class="modal-footer">
+              <!-- Button chức năng 1 -->
+              <button type="button" class="btn btn-primary" onclick="submitForm('add')">Nhập thêm</button>
+              <!-- Button chức năng 2 -->
+              <button type="button" class="btn btn-success" onclick="submitForm('subtract')">Xuất đi</button>
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    
+      <script>
+        const importButtons = document.querySelectorAll('.btn-export-product');
+        const editButtons = document.querySelectorAll('.btn-edit-product');
+        const deleteButtons = document.querySelectorAll('.btn-delete-product');
+        const createButtons = document.querySelectorAll('#create');
+        const exportButtons = document.querySelectorAll('#create');
+
+        importButtons.forEach(button => {
+          button.addEventListener('click', function() {
+            // Lấy giá trị data-id-product từ button
+            const idProduct = this.getAttribute('data-id-product');
+            createButtons.setAttribute('data-id-product', idProduct)
+            // Chuyển giá trị idProduct đến controller hoặc nơi cần thiết
+            // Ví dụ: Chuyển đến "/user/them-moi?id_product=<idProduct>"
+            window.location.href = `/user/import-product?id_product=${idProduct}`;
+          });
+        });
+        exportButtons.forEach(button => {
+          button.addEventListener('click', function() {
+            // Lấy giá trị data-id-product từ button
+            const idProduct = this.getAttribute('data-id-product');
+            window.location.href = `/user/export-product?id_product=${idProduct}`;
+          });
+        });
+          editButtons.forEach(button => {
+            button.addEventListener('click', function(event) {
+            const idProduct = this.getAttribute('data-id-product');
+            window.location.href = `/product/edit-product?id_product=${idProduct}`;
+            });
+          });
+
+        deleteButtons.forEach(button => {
+          button.addEventListener('click', function() {
+            const idProduct = this.getAttribute('data-id-product');
+            window.location.href = `/user/delete-product?id_product=${idProduct}`;
+          });
+        });
+        function passDataIdProduct(button) {
+    // Lấy giá trị data-id-product từ button gốc
+          var dataIdProduct = button.getAttribute('data-id-product');
+          console.log('Clicked button with data-id-product:', dataIdProduct);
+          // Gán giá trị vào input hidden trong form modal
+          document.getElementById('dataIdProduct').value = dataIdProduct;
+
+          // Gán giá trị vào thuộc tính data-id-product của cả hai nút chức năng
+          document.querySelector('.btn-primary').setAttribute('data-id-product', dataIdProduct);
+          document.querySelector('.btn-success').setAttribute('data-id-product', dataIdProduct);
+        }
+        
+        function submitForm(actionType) {
+          // Gán giá trị actionType vào input hidden
+          document.getElementById('actionType').value = actionType;
+          if(actionType == 'add'){
+            alert("Nhập thành công")
+          }
+          else{
+            alert("Xuất thành công")
+
+          }
+          // Submit form ẩn
+          document.getElementById('hiddenSubmit').click();
+
+          // Đóng modal
+          $('#myFormModal').modal('hide');
+        }
+      </script>
+</body>
+</html>
